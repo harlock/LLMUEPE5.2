@@ -23,3 +23,9 @@ beautifulsoup4>=4.12.0
 # OCR
 pillow>=10.0.0
 pytesseract>=0.3.10
+#haystack
+haystack-ai>=2.0.0
+qdrant-haystack
+ollama-haystack
+markdown-it-py
+mdit_plain

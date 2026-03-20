@@ -14,6 +14,7 @@ Este paquete hace:
 
 ## 1) Preparar entorno
 
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate    # Windows: .venv\Scripts\activate
@@ -52,9 +53,15 @@ scrapy runspider confluence_download_html_spider.py \
   python html_to_md_batch.py --config config_batch.yaml
 
 
+
 ```
+## instalar ollama
+
+https://ollama.com/download
 
 ## continar aqui con la docuntacion
+
+<!--
 ## 3) Scrapea SOLO internos (recomendado)
 scrapy runspider scrape_site_spider.py -a config=config.yaml -a urls_file=internal_urls.jsonl -O scraped_pages.jsonl
 
@@ -77,3 +84,9 @@ scrapy runspider scrape_site_spider.py \
   -O scraped_pages.jsonl \
   -s LOG_FILE=scrape.log \
   -s LOG_LEVEL=INFO
+-->
+
+```
+
+
+```
