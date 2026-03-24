@@ -18,7 +18,8 @@ from haystack.components.retrievers import MultiQueryEmbeddingRetriever
 
 #document_store = InMemoryDocumentStore()
 document_store = QdrantDocumentStore(
-    ":memory:",
+    #":memory:",
+    path="./qdrant_db",
     recreate_index=True,
     return_embedding=True,
     embedding_dim = 384,
@@ -35,8 +36,8 @@ preprocessing_pipeline.add_component(instance=document_cleaner, name="document_c
 
 preprocessing_pipeline.connect("markdown_converter", "document_cleaner")
 
-path = "./inputs"
-files = list(Path(path).glob("*.md"))
+path = "./out_md"
+files = list(Path(path).rglob("*.md"))
 print (files)
 
 custom_metadata = {"Platform": "UEPE", "version": "5.2"}
