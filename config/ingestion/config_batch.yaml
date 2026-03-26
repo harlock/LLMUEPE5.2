@@ -1,0 +1,51 @@
+site:
+  allowed_domains:
+    - "infozone.atlassian.net"
+  obey_robots: true
+
+scrape:
+  # ETAPA 1: salida del spider (HTML)
+  output_dir: "./data/raw/out_html"
+
+  # ETAPA 2: salida del conversor (MD)
+  md_output_dir: "./data/raw/out_md"
+
+  # Scopes del contenido principal (evita menú lateral)
+  content_scope_css:
+    - "#AkMainContent [data-test-id='content-body']"
+    - "#AkMainContent #content-body"
+    - "#AkMainContent"
+    - "#content-body"
+    - "[data-test-id='content-body']"
+    - ".ak-renderer-document"
+    - "div#main-content[data-testid='pageContentRendererTestId']"
+    - "div#main-content"
+
+  # Spider: intenta también export_view vía REST (recomendado)
+  use_rest_export_view_fallback: true
+  export_view_expand: "body.export_view"
+
+  # Spider: opcional descargar además la URL con ?format=export_view
+  also_download_url_export_view: false
+
+network:
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+  download_delay: 2.5
+  randomize_download_delay: true
+  concurrent_requests: 1
+  concurrent_requests_per_domain: 1
+  retry_times: 8
+  timeout_seconds: 45
+  autothrottle_enabled: true
+  autothrottle_start_delay: 2.0
+  autothrottle_max_delay: 120.0
+  autothrottle_target_concurrency: 0.5
+
+  # 🔒 Si es privado: agrega una opción de auth (elige UNA)
+  extra_headers:
+    # Opción A (recomendada): Basic con API token (base64(email:api_token))
+    # Authorization: "Basic <BASE64(email:api_token)>"
+    # Accept: "application/json"
+
+    # Opción B: Cookie válida (si ya estás logueado)
+    # Cookie: "cloud.session.token=...; atlassian.xsrf.token=..."python -m scrapy version -v

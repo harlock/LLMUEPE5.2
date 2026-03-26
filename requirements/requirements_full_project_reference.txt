@@ -1,0 +1,57 @@
+# Requerimientos completos del proyecto UEPE QA
+# Incluye: discovery, descarga HTML, conversión HTML->Markdown, motor QA,
+# API FastAPI y pipelines experimentales basados en Haystack/Qdrant/Ollama.
+
+# ---------------------------
+# Ingesta / crawling
+# ---------------------------
+scrapy>=2.11.0
+PyYAML>=6.0.1
+beautifulsoup4>=4.12.3
+lxml>=5.2.0
+markdownify>=0.12.1
+requests>=2.31.0
+
+# ---------------------------
+# API
+# ---------------------------
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+
+# ---------------------------
+# QA / retrieval / embeddings
+# ---------------------------
+haystack-ai>=2.0.0
+ollama-haystack>=2.0.0
+qdrant-haystack>=6.0.0
+sentence-transformers>=2.6.0
+torch>=2.1.0
+numpy>=1.26.0
+
+# ---------------------------
+# Utilidades recomendadas
+# ---------------------------
+python-dotenv>=1.0.1
+httpx>=0.27.0
+
+# ---------------------------
+# Nota
+# ---------------------------
+# Este archivo cubre los scripts que compartiste actualmente:
+# - discover_urls_spider.py
+# - confluence_download_html_spider.py
+# - html_to_md_batch.py
+# - qa_api_app.py
+# - qa_engine_core.py
+# - indexing_pipeline.py
+# - pipeline_markdown_install.py
+# - pipeline_V2.py
+# - pipeline_V3.py
+# - markdown_install_qa_haystack_ollama.py
+# - markdown_install_qa_dynamic.py
+#
+# No incluye dependencias de OCR, Milvus ni LangChain porque en los archivos
+# operativos compartidos no son necesarias para el flujo principal.
+# Si quieres conservar prototipos viejos basados en Milvus/LangChain/OCR,
+# conviene manejarlos en un requirements_legacy.txt separado.

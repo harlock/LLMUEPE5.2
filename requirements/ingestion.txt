@@ -1,0 +1,8 @@
+-r base.txt
+scrapy>=2.11.0
+cssselect>=1.2
+parsel>=1.8
+w3lib>=2.1
+service-identity>=24.1
+cryptography>=42.0
+pyOpenSSL>=24.0

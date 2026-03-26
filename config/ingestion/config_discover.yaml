@@ -1,0 +1,68 @@
+site:
+  start_url: "https://infozone.atlassian.net/wiki/spaces/UEPE5D/pages/639730707/Installation+Guide+-+AWS+5.2"
+  allowed_domains:
+    - "infozone.atlassian.net"
+  follow_external: false
+  obey_robots: true
+
+discovery:
+  mode: "crawl"
+  depth_limit: 6
+  path_depth_limit: 999
+  strip_query: true
+
+  # Scope principal (contenido)
+  link_scope_css: "#AkMainContent"
+
+  # Scopes alternos (cuando AkMainContent viene vacío o no trae anchors)
+  fallback_scopes_css:
+    - "#AkMainContent [data-test-id='content-body']"
+    - "#content-body"
+    - ".ak-renderer-document"
+    - "div#main-content[data-testid='pageContentRendererTestId']"
+    - "div#main-content"
+
+  min_links_in_scope: 3
+  extract_adf_links: true
+  fix_common_typos: true
+
+  # A veces ayuda a que macros expandan links visibles (no siempre)
+  use_export_view_param: true
+
+  allow_regex:
+    - "^https?://infozone\\.atlassian\\.net/wiki/spaces/UEPE5D/pages/\\d+/.+"
+
+  deny_regex:
+    - "/wiki/spaces/UEPE5D/labels/"
+    - "/wiki/label/"
+    - "/wiki/download/"
+    - "/wiki/spaces/UEPE5D/attachments/"
+    # si quieres SOLO 5.2:
+    - "5\\.0(?:$|[/?#])"
+    - "5\\.1(?:$|[/?#])"
+
+
+external:
+  capture: true
+  follow: false
+  max_capture_from_internal_depth: 5
+  allow_domains:
+    - "github.com"
+    - "gitlab.com"
+    - "docs.aws.amazon.com"
+    - "eksctl.io"
+
+network:
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+  download_delay: 2.5
+  randomize_download_delay: true
+  concurrent_requests: 1
+  concurrent_requests_per_domain: 1
+  retry_times: 8
+  timeout_seconds: 45
+  autothrottle_enabled: true
+  autothrottle_start_delay: 2.0
+  autothrottle_max_delay: 120.0
+  autothrottle_target_concurrency: 0.5
+
+  # Si es privado (recomendado): auth/cookies

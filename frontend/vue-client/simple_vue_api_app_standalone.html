@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA API Client - Vue</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800">
+  <div id="app" class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight">Cliente Vue para tu API QA</h1>
+      <p class="text-slate-600 mt-2">Interfaz simple con Vue 3 y Tailwind para consumir tu API FastAPI.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6">
+      <section class="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-fit">
+        <h2 class="text-xl font-semibold mb-4">Configuración</h2>
+
+        <label class="block text-sm font-medium mb-2">URL base de la API</label>
+        <input
+          v-model="apiBase"
+          type="text"
+          class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          placeholder="http://127.0.0.1:8010"
+        />
+
+        <div class="grid grid-cols-2 gap-3 mt-4">
+          <button
+            @click="checkHealth"
+            :disabled="loading.health"
+            class="rounded-xl bg-slate-900 text-white px-4 py-3 font-medium hover:opacity-90 transition disabled:opacity-50"
+          >
+            {{ loading.health ? 'Verificando...' : 'Health' }}
+          </button>
+          <button
+            @click="buildIndex"
+            :disabled="loading.build"
+            class="rounded-xl bg-slate-700 text-white px-4 py-3 font-medium hover:opacity-90 transition disabled:opacity-50"
+          >
+            {{ loading.build ? 'Construyendo...' : 'Build' }}
+          </button>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex items-center justify-between gap-3">
+            <span class="text-sm font-medium">Estado</span>
+            <span :class="badgeClass" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold">
+              {{ status.label }}
+            </span>
+          </div>
+          <pre class="mt-3 text-xs bg-slate-50 border border-slate-200 rounded-xl p-3 overflow-auto whitespace-pre-wrap min-h-[120px]">{{ status.detail }}</pre>
+        </div>
+
+        <div class="mt-6 border-t border-slate-200 pt-4">
+          <h3 class="font-semibold mb-2">Sugerencias</h3>
+          <ul class="text-sm text-slate-600 space-y-2 list-disc pl-5">
+            <li>Primero valida <strong>Health</strong>.</li>
+            <li>Si el índice no existe, ejecuta <strong>Build</strong>.</li>
+            <li>Luego consulta con el panel derecho.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-xl font-semibold">Consulta</h2>
+            <p class="text-sm text-slate-600">Envía preguntas al endpoint <code>/query</code>.</p>
+          </div>
+          <div class="flex gap-3">
+            <button
+              @click="loadExample"
+              class="rounded-xl border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50 transition"
+            >
+              Cargar ejemplo
+            </button>
+            <button
+              @click="clearAll"
+              class="rounded-xl border border-slate-300 px-4 py-2 font-medium hover:bg-slate-50 transition"
+            >
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Pregunta</label>
+            <textarea
+              v-model="query"
+              rows="6"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+              placeholder="Escribe aquí tu consulta..."
+            ></textarea>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">top_k</label>
+              <input
+                v-model.number="topK"
+                type="number"
+                min="1"
+                max="50"
+                class="w-full rounded-xl border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-slate-400"
+              />
+            </div>
+            <div class="md:col-span-2 flex items-end">
+              <button
+                @click="askQuestion"
+                :disabled="loading.query"
+                class="w-full rounded-xl bg-emerald-600 text-white px-4 py-3 font-semibold hover:bg-emerald-700 transition disabled:opacity-50"
+              >
+                {{ loading.query ? 'Consultando...' : 'Consultar API' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 grid xl:grid-cols-3 gap-6">
+          <div class="xl:col-span-2">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold">Respuesta</h3>
+              <span class="text-xs text-slate-500">{{ metaInfo }}</span>
+            </div>
+            <div class="min-h-[260px] rounded-2xl border border-slate-200 bg-slate-50 p-4 whitespace-pre-wrap leading-7 text-sm">
+              {{ answer || 'Aquí aparecerá la respuesta de la API.' }}
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-semibold mb-2">Fuentes</h3>
+            <div class="space-y-3">
+              <template v-if="sources.length">
+                <div
+                  v-for="(src, index) in sources"
+                  :key="index"
+                  class="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                >
+                  <div class="font-semibold text-sm">{{ src.doc_title || src.heading || `Fuente ${index + 1}` }}</div>
+                  <div v-if="src.heading" class="text-xs text-slate-500 mt-1">Sección: {{ src.heading }}</div>
+                  <a
+                    v-if="src.page_url"
+                    :href="src.page_url"
+                    target="_blank"
+                    class="block mt-2 text-xs text-blue-700 break-all hover:underline"
+                  >
+                    {{ src.page_url }}
+                  </a>
+                  <div v-else class="mt-2 text-xs text-slate-400">Sin URL</div>
+                  <div v-if="Array.isArray(src.heading_path) && src.heading_path.length" class="text-xs text-slate-500 mt-2">
+                    Ruta: {{ src.heading_path.join(' › ') }}
+                  </div>
+                </div>
+              </template>
+              <div v-else class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                No se recibieron fuentes.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, computed } = Vue;
+
+    createApp({
+      setup() {
+        const state = Vue.reactive({
+          apiBase: 'http://127.0.0.1:8010',
+          query: 'What commands do I need to install external-dns?',
+          topK: 10,
+          answer: '',
+          sources: [],
+          metaInfo: '',
+          status: {
+            kind: 'idle',
+            label: 'Sin verificar',
+            detail: ''
+          },
+          loading: {
+            health: false,
+            build: false,
+            query: false
+          }
+        });
+
+        const badgeClass = computed(() => {
+          const map = {
+            idle: 'bg-slate-200 text-slate-700',
+            ok: 'bg-emerald-100 text-emerald-700',
+            warn: 'bg-amber-100 text-amber-700',
+            error: 'bg-rose-100 text-rose-700',
+            loading: 'bg-blue-100 text-blue-700'
+          };
+          return map[state.status.kind] || map.idle;
+        });
+
+        const normalizeBase = (url) => url.replace(/\/$/, '');
+
+        const setStatus = (kind, label, detail = '') => {
+          state.status.kind = kind;
+          state.status.label = label;
+          state.status.detail = detail;
+        };
+
+        const callApi = async (path, options = {}) => {
+          const base = normalizeBase(state.apiBase.trim());
+          const response = await fetch(`${base}${path}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(options.headers || {})
+            },
+            ...options
+          });
+
+          const contentType = response.headers.get('content-type') || '';
+          const data = contentType.includes('application/json')
+            ? await response.json()
+            : await response.text();
+
+          if (!response.ok) {
+            throw new Error(typeof data === 'string' ? data : JSON.stringify(data, null, 2));
+          }
+
+          return data;
+        };
+
+        const checkHealth = async () => {
+          state.loading.health = true;
+          try {
+            setStatus('loading', 'Verificando', 'Consultando /health ...');
+            const data = await callApi('/health', { method: 'GET' });
+            setStatus('ok', 'Disponible', JSON.stringify(data, null, 2));
+          } catch (error) {
+            setStatus('error', 'Error', String(error.message || error));
+          } finally {
+            state.loading.health = false;
+          }
+        };
+
+        const buildIndex = async () => {
+          state.loading.build = true;
+          try {
+            setStatus('loading', 'Construyendo', 'Ejecutando /build ...');
+            const data = await callApi('/build', {
+              method: 'POST',
+              body: JSON.stringify({})
+            });
+            setStatus('ok', 'Índice listo', JSON.stringify(data, null, 2));
+          } catch (error) {
+            setStatus('error', 'Error', String(error.message || error));
+          } finally {
+            state.loading.build = false;
+          }
+        };
+
+        const askQuestion = async () => {
+          if (!state.query.trim()) {
+            setStatus('warn', 'Falta consulta', 'Escribe una pregunta antes de consultar.');
+            return;
+          }
+
+          state.loading.query = true;
+          state.answer = 'Consultando...';
+          state.sources = [];
+          state.metaInfo = '';
+
+          try {
+            setStatus('loading', 'Consultando', 'Enviando petición a /query ...');
+            const data = await callApi('/query', {
+              method: 'POST',
+              body: JSON.stringify({
+                query: state.query,
+                top_k: Number(state.topK || 10)
+              })
+            });
+
+            state.answer = data.answer || 'Sin respuesta';
+            state.sources = data.sources || [];
+            state.metaInfo = `nodes_retrieved: ${data.nodes_retrieved ?? '-'} | haystack: ${data.haystack_enabled} | ollama: ${data.ollama_available}`;
+            setStatus('ok', 'Consulta completada', JSON.stringify(data, null, 2));
+          } catch (error) {
+            state.answer = 'Ocurrió un error al consultar la API.';
+            state.sources = [];
+            state.metaInfo = '';
+            setStatus('error', 'Error', String(error.message || error));
+          } finally {
+            state.loading.query = false;
+          }
+        };
+
+        const loadExample = () => {
+          state.query = 'What commands do I need to install external-dns?';
+          state.topK = 10;
+        };
+
+        const clearAll = () => {
+          state.query = '';
+          state.topK = 10;
+          state.answer = '';
+          state.sources = [];
+          state.metaInfo = '';
+          setStatus('idle', 'Sin verificar', '');
+        };
+
+        return {
+          ...Vue.toRefs(state),
+          badgeClass,
+          checkHealth,
+          buildIndex,
+          askQuestion,
+          loadExample,
+          clearAll
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

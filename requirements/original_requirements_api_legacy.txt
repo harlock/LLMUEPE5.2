@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+requests
+numpy
+markdownify
+beautifulsoup4
+lxml
+haystack-ai
+ollama-haystack

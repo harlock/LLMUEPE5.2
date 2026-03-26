@@ -1,0 +1,4 @@
+-r base.txt
+haystack-ai>=2.0.0
+ollama-haystack>=2.0.0
+qdrant-haystack>=7.0.0
