@@ -1,6 +1,6 @@
 # UEPE Project Structured
 
-Estructura física propuesta para tu proyecto completo, basada en los archivos y comandos que ya ejecutas hoy.
+
 
 ## Qué incluye
 
