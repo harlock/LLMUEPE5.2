@@ -35,7 +35,7 @@ preprocessing_pipeline.add_component(instance=document_cleaner, name="document_c
 
 preprocessing_pipeline.connect("markdown_converter", "document_cleaner")
 
-path = "./inputs"
+path = "./out_md"
 files = list(Path(path).glob("*.md"))
 print (files)
 
@@ -266,15 +266,15 @@ query_pipeline.connect("expander.queries", "retriever.queries")
 query_pipeline.connect("retriever.documents", "prompt_builder.documents")
 query_pipeline.connect("prompt_builder.prompt", "llm_generator.messages")
 
-#query = "How can I create a EKS cluster for installing UEPE?"
+query = "How can I create a EKS cluster for installing UEPE?"
 #query = "¿Cuáles son los pasos que debo seguir para instalar UEPE en AWS?"
-query = "¿Cuál es el primer paso para instalar UEPE en AWS?"
+#query = "¿Cuál es el primer paso para instalar UEPE en AWS?"
 #query = "¿Cómo genero el cluster de Kubernetes en AWS para instalar UEPE?"
 result = query_pipeline.run(
     {
         "expander": {"query": query},
         "prompt_builder": {"question": query},
-        "llm_generator": {"generation_kwargs": {"temperature": 0.8}}
+        "llm_generator": {"generation_kwargs": {"temperature": 0.1}}
     })
 
 #print(result["retriever"]["documents"])

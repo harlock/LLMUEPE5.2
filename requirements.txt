@@ -29,3 +29,4 @@ qdrant-haystack
 ollama-haystack
 markdown-it-py
 mdit_plain
+nltk>=3.9
