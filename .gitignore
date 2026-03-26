@@ -3,4 +3,5 @@
 out_html/
 out_md/
 urls_instalation.jsonl
+qdrant_db/
 data/
